@@ -288,7 +288,7 @@ async function main() {
                 localStorage.setItem('items_in_trade', JSON.stringify([...items_to_give]))
             }
 
-            window.close();
+            // window.close();
         }
     }
 }
