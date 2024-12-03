@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         One-Click Offer
+// @name         One-Click Offer (Improved)
 // @namespace    https://github.com/peleicht/backpack-offer-sender
 // @homepage     https://github.com/peleicht
 // @version      1.3.2
@@ -17,8 +17,8 @@
 // ==/UserScript==
 
 const allow_change = true;
-const btn_color = "#02d6d6";
-const next_btn_color = "#00ffff";
+const btn_color = "#b98fc8";
+const next_btn_color = "#b98fc8";
 const btn_text = "One Click Offer ⇄";
 
 let internal_request_sent = false;
@@ -28,7 +28,7 @@ main();
 async function main() {
 	"use strict";
 
-	if (location.hostname == "backpack.tf" && location.pathname.match(/\/(stats|classifieds|u)/)) {
+	if (location.hostname === "backpack.tf" && location.pathname.match(/\/(stats|classifieds|u)/)) {
 		await awaitDocumentReady();
 
 		//add new button with item and price info in url query
