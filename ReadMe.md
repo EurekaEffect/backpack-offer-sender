@@ -4,7 +4,7 @@ This browser extension (powered by [Tampermonkey](https://www.tampermonkey.net/)
 
 # This is a Fork
 
-This is a fork of One-Click Offer, props to the founder. I will continue to work on this plugin and if you have any ideas for the plugin, I will be happy to review them in issues. 
+This is a fork of One-Click Offer, props to the founder. I will continue to work on this plugin and if you have any ideas for the plugin, I will be happy to review them in the issues. 
 
 ### Features
 
