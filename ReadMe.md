@@ -29,10 +29,6 @@ This browser plugin adds a button to backpack.tf listings, which will instantly 
 
 - Wow!
 
-### Known issues
-
-- The items will be marked as 'in trade' forever, and they will be still unavailable if someone will decline the offer (Possible fix: type <code>localStorage.removeItem('items_in_trade')</code> to clear the list).
-
 ### Disclaimer
 
 The script is well tested and consistently produces correct results.

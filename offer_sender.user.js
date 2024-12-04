@@ -222,6 +222,9 @@ async function main() {
         window.our_inv = our_inventory;
         window.their_inv = their_inventory;
 
+        let items_in_trade = await getItemsInTrade();
+        console.log('items in trade: ' + JSON.stringify(items_in_trade))
+
         if (!params.has("tscript_id")) {
             //sell your item
             const needed_item_name = params.get("tscript_name").replace("u0023", "#");
@@ -239,9 +242,9 @@ async function main() {
             // Get partner currencies
             const currency_string = params.get("tscript_price");
             const currencies = toCurrencyTypes(currency_string);
-            const [their_currency, change] = pickCurrency(their_inventory, ...currencies);
+            const [their_currency, change] = pickCurrency([], their_inventory, ...currencies);
             if (change.find(c => c !== 0)) {
-                const [our_currency, change2] = pickCurrency(our_inventory, 0, ...change);
+                const [our_currency, change2] = pickCurrency(items_in_trade, our_inventory, 0, ...change);
                 if (change2.find(c => c !== 0)) return throwError("Could not balance currencies.");
                 for (let c of our_currency) items_to_give.push(toTradeOfferItem(c.id));
             }
@@ -262,10 +265,10 @@ async function main() {
             //get your currencies
             const currency_string = params.get("tscript_price");
             const currencies = toCurrencyTypes(currency_string);
-            const [our_currency, change] = pickCurrency(our_inventory, ...currencies);
-            if (change.find(c => c != 0)) {
-                const [their_currency, change2] = pickCurrency(their_inventory, 0, ...change);
-                if (change2.find(c => c != 0)) return throwError("Could not balance currencies");
+            const [our_currency, change] = pickCurrency(items_in_trade, our_inventory, ...currencies);
+            if (change.find(c => c !== 0)) {
+                const [their_currency, change2] = pickCurrency([], their_inventory, 0, ...change);
+                if (change2.find(c => c !== 0)) return throwError("Could not balance currencies");
                 for (let c of their_currency) items_to_receive.push(toTradeOfferItem(c.id));
             }
 
@@ -275,19 +278,6 @@ async function main() {
         const offer_id = await sendOffer(items_to_give, items_to_receive);
 
         if (offer_id) { // Success
-            items_to_give = items_to_give.map((item) => item['assetid']) // Mapping to assetid.
-
-            const items_in_trade_str = localStorage.getItem('items_in_trade')
-
-            if (items_in_trade_str) { // Marking items as ignored since they are in trade.
-                const items_in_trade = JSON.parse(items_in_trade_str)
-                items_in_trade.push(...items_to_give)
-
-                localStorage.setItem('items_in_trade', JSON.stringify([...items_in_trade]))
-            } else {
-                localStorage.setItem('items_in_trade', JSON.stringify([...items_to_give]))
-            }
-
             window.close();
         }
     }
@@ -377,6 +367,57 @@ function getInventories() {
             };
         });
     }
+}
+
+async function getItemsInTrade() {
+    const items_in_trade = []
+
+    const token = document.getElementById('application_config')
+        ?.getAttribute('data-loyalty_webapi_token')
+        ?.replace('"', '')
+        .replace('"', '')
+
+    if (!token) {
+        alert('Failed to get token for trade offer history.')
+        return items_in_trade
+    }
+
+    const url_api = `https://api.steampowered.com/IEconService/GetTradeOffers/v1/?get_received_offers=${1}&get_sent_offers=${1}&active_only=${1}&historical_only=${0}&get_descriptions=${0}&language=english&access_token=${token}`
+    return await fetch(url_api)
+        .then(async (response) => {
+            let json = await response.json()
+
+            if (!json['response']) return items_in_trade
+            json = json['response']
+
+            if (json['trade_offers_sent']) {
+                let trade_offers_sent = json['trade_offers_sent']
+
+                for (let trade_offer of trade_offers_sent) {
+                    if (trade_offer['items_to_give']) {
+                        let items_to_give = trade_offer['items_to_give']
+
+                        items_to_give = items_to_give.map((item) => item['assetid'])
+                        items_in_trade.push(...items_to_give)
+                    }
+                }
+            }
+
+            if (json['trade_offers_received']) {
+                let trade_offers_received = json['trade_offers_received']
+
+                for (let trade_offer of trade_offers_received) {
+                    if (trade_offer['items_to_give']) {
+                        let items_to_give = trade_offer['items_to_give']
+
+                        items_to_give = items_to_give.map((item) => item['assetid'])
+                        items_in_trade.push(...items_to_give)
+                    }
+                }
+            }
+
+            return items_in_trade
+        })
 }
 
 async function getInventory(steam_id) {
@@ -540,12 +581,7 @@ function toCurrencyTypes(currency_string) {
     return [keys, ref, rec, scrap];
 }
 
-function pickCurrency(inventory, keys, ref, rec, scrap) {
-    const items_in_trade_str = localStorage.getItem('items_in_trade')
-    const items_in_trade = items_in_trade_str
-        ? JSON.parse(items_in_trade_str)
-        : []
-
+function pickCurrency(items_in_trade, inventory, keys, ref, rec, scrap) {
     inventory = inventory.filter((item) => !items_in_trade.includes(item['id']))
 
     const inv_keys = inventory.filter(item => item.name === "Mann Co. Supply Crate Key");
