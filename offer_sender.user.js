@@ -288,7 +288,7 @@ async function main() {
                 localStorage.setItem('items_in_trade', JSON.stringify([...items_to_give]))
             }
 
-            // window.close();
+            window.close();
         }
     }
 }
@@ -546,7 +546,7 @@ function pickCurrency(inventory, keys, ref, rec, scrap) {
         ? JSON.parse(items_in_trade_str)
         : []
 
-    inventory = inventory.filter((item) => !items_in_trade.includes(item['assetid']))
+    inventory = inventory.filter((item) => !items_in_trade.includes(item['id']))
 
     const inv_keys = inventory.filter(item => item.name === "Mann Co. Supply Crate Key");
     const inv_ref = inventory.filter(item => item.name === "Refined Metal");
