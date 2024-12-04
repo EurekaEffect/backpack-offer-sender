@@ -1,34 +1,37 @@
-# One-Click Offer for Backpack.tf
+# Instant Trade Offer for Backpack.tf
 
 This browser plugin adds a button to backpack.tf listings, which will instantly send your offer as specified by the listing.
+*This is a fork of One-Click Offer, props to the founder.*
 
 ### Features
 
-- Adds a Button that sends the offer for you
-- Supports both [Classic](https://backpack.tf) and [Next](https://next.backpack.tf) backpack.tf
-- Supports practically every buy and sell order
-- Makes use of change
-- Avoids reusing the same items
+- Adds a Button that sends the offer for you.
+- Supports both [Classic](https://backpack.tf) and [Next](https://next.backpack.tf) backpack.tf.
+- Supports practically every buy and sell order.
+- Makes use of change.
+- Avoids reusing the same items (*This fork makes it better*).
 
 ### Installation
 
 - Install [Tampermonkey](https://www.tampermonkey.net/)
-- [Open the script](https://github.com/peleicht/backpack-offer-sender/raw/main/offer_sender.user.js)
+- [Open the script](https://github.com/EurekaEffect/instant-trade-offer/raw/main/offer_sender.user.js)
 - Click Install
 
 ### Usage
 
-- Simply find the blue button on the listing
-
+- Simply find the light-purple button on the listing
+- 
 ![listings with buttons](./images/classifieds.png)
 
-- Click
-
-  (The Pros use middle click)
+- Click (The Pros use middle click)
 
 ![tradeoffer](./images/tradeoffer.png)
 
 - Wow!
+
+### Known issues
+
+- The items will be marked as 'in trade' forever, and they will be still unavailable if someone will decline the offer (Possible fix: type <code>localStorage.removeItem('items_in_trade')</code> to clear the list).
 
 ### Disclaimer
 
