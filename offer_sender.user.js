@@ -303,7 +303,7 @@ async function main() {
         const offer_id = await sendOffer(items_to_give, items_to_receive);
 
         if (offer_id) { // Success
-            // window.close();
+            window.close();
         }
     }
 }
