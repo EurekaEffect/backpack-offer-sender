@@ -601,8 +601,11 @@ function toCurrencyTypes(currency_string, is_buy_listing) {
                 if (next_step <= decimals || truncated === decimals) {
                     const new_value = truncate(ref + next_step)
 
-                    alert(`Rounding refined metal from ${metal} to ${new_value}`)
-                    metal = new_value
+                    if (metal !== new_value) {
+                        alert(`Rounding refined metal from ${metal} to ${new_value}`)
+                        metal = new_value
+                    }
+
                     break
                 }
             }
@@ -613,8 +616,11 @@ function toCurrencyTypes(currency_string, is_buy_listing) {
                 if (next_step >= decimals) {
                     const new_value = truncate(ref + next_step)
 
-                    alert(`Rounding refined metal from ${metal} to ${new_value}`)
-                    metal = new_value
+                    if (metal !== new_value) {
+                        alert(`Rounding refined metal from ${metal} to ${new_value}`)
+                        metal = new_value
+                    }
+
                     break
                 }
             }
