@@ -12,6 +12,7 @@ This is a fork of One-Click Offer, props to the founder. I will continue to work
 - Supports both [Classic](https://backpack.tf) and [Next](https://next.backpack.tf) backpack.tf.
 - Supports practically every buy and sell order, including those that don't contain the trade offer button.
 - Makes use of change.
+- Rounds the price to the nearest 0.11, 0.22 etc. (Got inspired by the [Hav's fork](https://github.com/HavishH/backpack-offer-sender))
 - Avoids reusing the same items by looking into the trade offer history.
 
 ### Installation

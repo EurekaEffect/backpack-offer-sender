@@ -55,11 +55,7 @@ async function main() {
             // Ignore specific buy orders
             let item_id_text = "";
             if (info.getAttribute("data-listing_intent") === "buy") {
-                if (
-                    item_name.includes("Unusual") &&
-                    !item_name.includes("Haunted Metal Scrap") &&
-                    !item_name.includes("Horseless Headless Horsemann's Headtaker")
-                ) {
+                if (item_name.includes("Unusual") && !item_name.includes("Haunted Metal Scrap") && !item_name.includes("Horseless Headless Horsemann's Headtaker")) {
                     continue; // Ignore generic unusual buy orders
                 }
 
@@ -197,11 +193,7 @@ async function main() {
                 //ignore buy orders on specific items
                 let item_id_text = "";
                 if (header.getElementsByClassName("text-buy").length != 0) {
-                    if (
-                        item_name.includes("Unusual") &&
-                        !item_name.includes("Haunted Metal Scrap") &&
-                        !item_name.includes("Horseless Headless Horsemann's Headtaker")
-                    ) {
+                    if (item_name.includes("Unusual") && !item_name.includes("Haunted Metal Scrap") && !item_name.includes("Horseless Headless Horsemann's Headtaker")) {
                         continue; //ignore generic unusual buy orders
                     }
 
@@ -274,7 +266,7 @@ async function main() {
 
             // Get partner currencies
             const currency_string = params.get("tscript_price");
-            const currencies = toCurrencyTypes(currency_string);
+            const currencies = toCurrencyTypes(currency_string, true);
             const [their_currency, change] = pickCurrency([], their_inventory, ...currencies);
             if (change.find(c => c !== 0)) {
                 const [our_currency, change2] = pickCurrency(items_in_trade, our_inventory, 0, ...change);
@@ -297,7 +289,7 @@ async function main() {
 
             //get your currencies
             const currency_string = params.get("tscript_price");
-            const currencies = toCurrencyTypes(currency_string);
+            const currencies = toCurrencyTypes(currency_string, false);
             const [our_currency, change] = pickCurrency(items_in_trade, our_inventory, ...currencies);
             if (change.find(c => c !== 0)) {
                 const [their_currency, change2] = pickCurrency([], their_inventory, 0, ...change);
@@ -311,7 +303,7 @@ async function main() {
         const offer_id = await sendOffer(items_to_give, items_to_receive);
 
         if (offer_id) { // Success
-            window.close();
+            // window.close();
         }
     }
 }
@@ -395,8 +387,7 @@ function getInventories() {
     function parseInventory(items) {
         return items.map(item => {
             return {
-                id: item.id,
-                name: nameFromItem(item),
+                id: item.id, name: nameFromItem(item),
             };
         });
     }
@@ -525,12 +516,9 @@ async function sendOffer(items_to_give, items_to_receive) {
     for (let key in body) form.append(key, body[key]);
 
     try {
-        const response_body = await (
-            await fetch("https://steamcommunity.com/tradeoffer/new/send", {
-                method: "POST",
-                body: form,
-            })
-        ).json();
+        const response_body = await (await fetch("https://steamcommunity.com/tradeoffer/new/send", {
+            method: "POST", body: form,
+        })).json();
 
         if (response_body.strError) return throwError(response_body.strError);
 
@@ -546,9 +534,7 @@ function nameFromItem(item) {
         for (let i = 0; i < item.descriptions.length; i++) {
             const desc = item.descriptions[i];
 
-            if (desc.value.includes("''")) continue;
-            else if (desc.value === "( Not Usable in Crafting )") name = "Non-Craftable " + name;
-            else if (desc.value.startsWith("★ Unusual Effect: ")) {
+            if (desc.value.includes("''")) continue; else if (desc.value === "( Not Usable in Crafting )") name = "Non-Craftable " + name; else if (desc.value.startsWith("★ Unusual Effect: ")) {
                 for (let tag of item.tags) {
                     if (tag.category === "Type" && tag.internal_name === "Supply Crate") continue; //crates have normal unusual tag
                 }
@@ -582,14 +568,11 @@ function normalizeName(name) {
 
 function toTradeOfferItem(id) {
     return {
-        appid: 440,
-        contextid: "2",
-        amount: 1,
-        assetid: id,
+        appid: 440, contextid: "2", amount: 1, assetid: id,
     };
 }
 
-function toCurrencyTypes(currency_string) {
+function toCurrencyTypes(currency_string, is_buy_listing) {
     const match = currency_string.match(/^(\d+ keys?,? ?)?(\d+(?:\.\d+)? ref)?$/);
     if (!match) return throwError("Could not parse currency " + currency_string);
 
@@ -600,8 +583,42 @@ function toCurrencyTypes(currency_string) {
         keys = Number(match[1].slice(0, key_length));
     }
     if (match[2]) {
+        const truncate = (number) => { return Math.floor(number * 100) / 100; }
+
         const ref_length = match[2].indexOf(" ");
-        metal = Number(match[2].slice(0, ref_length));
+        metal = truncate(Number(match[2].slice(0, ref_length)));
+
+        const ref = Math.floor(metal)
+
+        const step = 0.1111111111111111
+        const decimals = Math.round((metal % 1) * 100) / 100
+
+        if (is_buy_listing) {
+            for (let i = 9; i >= 0; i--) {
+                const next_step = step * i
+                const truncated = Math.floor(next_step * 100) / 100;
+
+                if (next_step <= decimals || truncated === decimals) {
+                    const new_value = truncate(ref + next_step)
+
+                    alert(`Rounding refined metal from ${metal} to ${new_value}`)
+                    metal = new_value
+                    break
+                }
+            }
+        } else {
+            for (let i = 0; i <= 9; i++) {
+                const next_step = step * i
+
+                if (next_step >= decimals) {
+                    const new_value = truncate(ref + next_step)
+
+                    alert(`Rounding refined metal from ${metal} to ${new_value}`)
+                    metal = new_value
+                    break
+                }
+            }
+        }
     }
 
     const ref = Math.floor(metal);
@@ -697,54 +714,9 @@ function pickCurrency(items_in_trade, inventory, keys, ref, rec, scrap) {
     items = items.concat(take_scrap);
 
     //checks if anything went wrong. This should never happen but lets check anyways.
-    if (
-        keys < 0 ||
-        ref < 0 ||
-        rec < 0 ||
-        scrap < 0 ||
-        change.ref < 0 ||
-        change.rec < 0 ||
-        change.scrap < 0 ||
-        key_start < 0 ||
-        ref_start < 0 ||
-        rec_start < 0 ||
-        scrap_start < 0 ||
-        keys === undefined ||
-        ref === undefined ||
-        rec === undefined ||
-        scrap === undefined ||
-        keys > inv_keys.length ||
-        ref > inv_ref.length ||
-        rec > inv_rec.length ||
-        scrap > inv_scrap.length ||
-        items.length < keys ||
-        take_keys.length != keys ||
-        take_ref.length != ref ||
-        take_rec.length != rec ||
-        take_scrap.length != scrap
-    ) {
+    if (keys < 0 || ref < 0 || rec < 0 || scrap < 0 || change.ref < 0 || change.rec < 0 || change.scrap < 0 || key_start < 0 || ref_start < 0 || rec_start < 0 || scrap_start < 0 || keys === undefined || ref === undefined || rec === undefined || scrap === undefined || keys > inv_keys.length || ref > inv_ref.length || rec > inv_rec.length || scrap > inv_scrap.length || items.length < keys || take_keys.length != keys || take_ref.length != ref || take_rec.length != rec || take_scrap.length != scrap) {
         console.log("Something went wrong balancing currencies:");
-        console.log(
-            [
-                inv_keys.length,
-                inv_ref.length,
-                inv_rec.length,
-                inv_scrap.length,
-                keys,
-                ref,
-                rec,
-                scrap,
-                key_start,
-                ref_start,
-                rec_start,
-                scrap_start,
-                take_keys,
-                take_ref,
-                take_rec,
-                take_scrap,
-                JSON.stringify(items, undefined, 4),
-            ].join("\n")
-        );
+        console.log([inv_keys.length, inv_ref.length, inv_rec.length, inv_scrap.length, keys, ref, rec, scrap, key_start, ref_start, rec_start, scrap_start, take_keys, take_ref, take_rec, take_scrap, JSON.stringify(items, undefined, 4),].join("\n"));
         return throwError("Could not balance currencies");
     }
 
@@ -768,8 +740,7 @@ function interceptInventoryRequest() {
 
 function awaitDocumentReady() {
     return new Promise(async res => {
-        if (document.readyState != "loading") res();
-        else document.addEventListener("DOMContentLoaded", res);
+        if (document.readyState != "loading") res(); else document.addEventListener("DOMContentLoaded", res);
     });
 }
 
