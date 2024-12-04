@@ -1,16 +1,18 @@
 # Instant Trade Offer for Backpack.tf
 
-This browser plugin adds a button to backpack.tf listings, which will instantly send your offer as specified by the listing.
-*This is a fork of One-Click Offer, props to the founder.*
+This browser extension (powered by [Tampermonkey](https://www.tampermonkey.net/)) that adds a button to backpack.tf listings, which will instantly send your offer as specified by the listing.
+
+# This is a Fork
+
+This is a fork of One-Click Offer, props to the founder. I will continue to work on this plugin and if you have any ideas for the plugin, I will be happy to review them in issues. 
 
 ### Features
 
-- Adds a Button that sends the offer for you.
+- Adds a button that sends the offer for you.
 - Supports both [Classic](https://backpack.tf) and [Next](https://next.backpack.tf) backpack.tf.
-- Supports practically every buy and sell order.
+- Supports practically every buy and sell order, including those that don't contain the trade offer button.
 - Makes use of change.
-- Avoids reusing the same items (*This fork makes it WAY better*).
-- *Tries to search for the trade offer url even if it's not specified.* ![img.png](images/parsed_trade_url.png)
+- Avoids reusing the same items by looking into the trade offer history.
 
 ### Installation
 
@@ -21,7 +23,6 @@ This browser plugin adds a button to backpack.tf listings, which will instantly 
 ### Usage
 
 - Simply find the light-purple button on the listing
-- 
 ![listings with buttons](./images/classifieds.png)
 
 - Click (The Pros use middle click)
