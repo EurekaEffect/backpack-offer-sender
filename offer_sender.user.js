@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         One-Click Offer (Improved)
+// @name         Instant Trade Offer
 // @namespace    https://github.com/peleicht/backpack-offer-sender
 // @homepage     https://github.com/peleicht
 // @version      1.3.2
@@ -12,14 +12,14 @@
 // @match        *://backpack.tf/u/*
 // @match        *://next.backpack.tf/*
 // @match        *://steamcommunity.com/tradeoffer/new*
-// @icon         data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💠</text></svg>
+// @icon         data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚛️</text></svg>
 // @run-at       document-start
 // ==/UserScript==
 
 const allow_change = true;
 const btn_color = "#b98fc8";
 const next_btn_color = "#b98fc8";
-const btn_text = "One Click Offer ⇄";
+const btn_text = "Instant Trade Offer ⇄";
 
 let internal_request_sent = false;
 
