@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         One-Click Offer (Improved)
+// @name         Instant Trade Offer
 // @namespace    https://github.com/peleicht/backpack-offer-sender
 // @homepage     https://github.com/peleicht
 // @version      1.3.2
@@ -12,14 +12,14 @@
 // @match        *://backpack.tf/u/*
 // @match        *://next.backpack.tf/*
 // @match        *://steamcommunity.com/tradeoffer/new*
-// @icon         data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💠</text></svg>
+// @icon         data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚛️</text></svg>
 // @run-at       document-start
 // ==/UserScript==
 
 const allow_change = true;
 const btn_color = "#b98fc8";
 const next_btn_color = "#b98fc8";
-const btn_text = "One Click Offer ⇄";
+const btn_text = "Instant Trade Offer ⇄";
 
 let internal_request_sent = false;
 
@@ -50,6 +50,8 @@ async function main() {
             const info = document.querySelector("#" + order.id + " > div.listing-item > div");
             const price = info.getAttribute("data-listing_price");
 
+            if (!price) continue // Probably $ instead of virtual currency.
+
             // Ignore specific buy orders
             let item_id_text = "";
             if (info.getAttribute("data-listing_intent") === "buy") {
@@ -75,10 +77,42 @@ async function main() {
                 item_id_text = "&tscript_id=" + info.getAttribute("data-id");
             }
 
-            const btn_selector = "#" + order.id + " > div.listing-body > div.listing-header > div.listing-buttons > a.btn.btn-bottom.btn-xs.btn-";
+            let btn_selector = "#" + order.id + " > div.listing-body > div.listing-header > div.listing-buttons > a.btn.btn-bottom.btn-xs.btn-";
             let send_offer_btn = document.querySelector(btn_selector + "success");
             if (!send_offer_btn) send_offer_btn = document.querySelector(btn_selector + "primary"); // Button is blue (negotiable listing)
-            if (!send_offer_btn || send_offer_btn.getAttribute("href").startsWith("steam://")) continue; // No trade offer button, stop
+
+            if (!send_offer_btn || send_offer_btn.getAttribute("href").startsWith("steam://")) {
+                let found_trade_url = false
+
+                let btn_selector = "#" + order.id + " > div.listing-body > span > span.user-handle > a.user-link";
+                const user_link = document.querySelector(btn_selector)
+
+                if (user_link) {
+                    const offer_params = user_link.getAttribute('data-offers-params')
+
+                    if (offer_params) {
+                        const trade_url = `https://steamcommunity.com/tradeoffer/new/${offer_params}`
+
+                        /**/
+                        send_offer_btn = document.createElement("a");
+                        send_offer_btn.href = trade_url;
+                        send_offer_btn.target = "_blank";
+                        send_offer_btn.className = "btn btn-bottom btn-xs btn-success";
+                        send_offer_btn.setAttribute("data-tip", "top");
+                        send_offer_btn.setAttribute("data-original-title", "Click to open a Trade Offer with this user. Please only offer the buyout.");
+
+                        const icon = document.createElement("i");
+                        icon.className = "fa fa-sw fa-exchange";
+
+                        send_offer_btn.appendChild(icon);
+                        /**/
+
+                        found_trade_url = true
+                    }
+                }
+
+                if (!found_trade_url) continue;
+            }
 
             // Add new button
             const btn_clone = send_offer_btn.cloneNode(true);
@@ -223,7 +257,6 @@ async function main() {
         window.their_inv = their_inventory;
 
         let items_in_trade = await getItemsInTrade();
-        console.log('items in trade: ' + JSON.stringify(items_in_trade))
 
         if (!params.has("tscript_id")) {
             //sell your item
