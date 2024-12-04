@@ -9,7 +9,8 @@ This browser plugin adds a button to backpack.tf listings, which will instantly 
 - Supports both [Classic](https://backpack.tf) and [Next](https://next.backpack.tf) backpack.tf.
 - Supports practically every buy and sell order.
 - Makes use of change.
-- Avoids reusing the same items (*This fork makes it better*).
+- Avoids reusing the same items (*This fork makes it WAY better*).
+- *Tries to search for the trade offer url even if it's not specified.* ![img.png](images/parsed_trade_url.png)
 
 ### Installation
 
