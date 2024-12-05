@@ -720,27 +720,20 @@ function pickCurrency(asset_ids_in_trade, inventory, keys, ref, rec, scrap) {
         change.scrap -= reduce;
     }
 
-    // TODO: take them in order from the start.
-    //start taking items from random position; possible ranges are between 0 and length-amount
-    const key_start = Math.floor(Math.random() * (inv_keys.length - keys + 1));
-    const ref_start = Math.floor(Math.random() * (inv_ref.length - ref + 1));
-    const rec_start = Math.floor(Math.random() * (inv_rec.length - rec + 1));
-    const scrap_start = Math.floor(Math.random() * (inv_scrap.length - scrap + 1));
-
     //actually take the items
-    const take_keys = inv_keys.slice(key_start, key_start + keys);
-    const take_ref = inv_ref.slice(ref_start, ref_start + ref);
-    const take_rec = inv_rec.slice(rec_start, rec_start + rec);
-    const take_scrap = inv_scrap.slice(scrap_start, scrap_start + scrap);
+    const take_keys = inv_keys.slice(0, keys);
+    const take_ref = inv_ref.slice(0, ref);
+    const take_rec = inv_rec.slice(0, rec);
+    const take_scrap = inv_scrap.slice(0, scrap);
     let items = take_keys;
     items = items.concat(take_ref);
     items = items.concat(take_rec);
     items = items.concat(take_scrap);
 
     //checks if anything went wrong. This should never happen but lets check anyways.
-    if (keys < 0 || ref < 0 || rec < 0 || scrap < 0 || change.ref < 0 || change.rec < 0 || change.scrap < 0 || key_start < 0 || ref_start < 0 || rec_start < 0 || scrap_start < 0 || keys === undefined || ref === undefined || rec === undefined || scrap === undefined || keys > inv_keys.length || ref > inv_ref.length || rec > inv_rec.length || scrap > inv_scrap.length || items.length < keys || take_keys.length != keys || take_ref.length != ref || take_rec.length != rec || take_scrap.length != scrap) {
+    if (keys < 0 || ref < 0 || rec < 0 || scrap < 0 || change.ref < 0 || change.rec < 0 || change.scrap < 0 || keys === undefined || ref === undefined || rec === undefined || scrap === undefined || keys > inv_keys.length || ref > inv_ref.length || rec > inv_rec.length || scrap > inv_scrap.length || items.length < keys || take_keys.length != keys || take_ref.length != ref || take_rec.length != rec || take_scrap.length != scrap) {
         console.log("Something went wrong balancing currencies:");
-        console.log([inv_keys.length, inv_ref.length, inv_rec.length, inv_scrap.length, keys, ref, rec, scrap, key_start, ref_start, rec_start, scrap_start, take_keys, take_ref, take_rec, take_scrap, JSON.stringify(items, undefined, 4),].join("\n"));
+        console.log([inv_keys.length, inv_ref.length, inv_rec.length, inv_scrap.length, keys, ref, rec, scrap, take_keys, take_ref, take_rec, take_scrap, JSON.stringify(items, undefined, 4),].join("\n"));
         return throwError("Could not balance currencies");
     }
 
