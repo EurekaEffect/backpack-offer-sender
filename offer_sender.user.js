@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         Instant Trade Offer
-// @namespace    https://github.com/peleicht/backpack-offer-sender
-// @homepage     https://github.com/peleicht
+// @namespace    https://github.com/EurekaEffect/instant-trade-offer
+// @homepage     https://github.com/EurekaEffect
 // @version      1.3.2
-// @description  Adds a button on backpack.tf listings that instantly sends the offer.
+// @description  An enchanced version of One-Click Offer.
 // @author       Brom127
-// @updateURL    https://github.com/peleicht/backpack-offer-sender/raw/main/offer_sender.user.js
-// @downloadURL  https://github.com/peleicht/backpack-offer-sender/raw/main/offer_sender.user.js
+// @updateURL    https://github.com/EurekaEffect/instant-trade-offer/raw/refs/heads/main/offer_sender.user.js
+// @downloadURL  https://github.com/EurekaEffect/instant-trade-offer/raw/refs/heads/main/offer_sender.user.js
 // @match        *://backpack.tf/stats/*
 // @match        *://backpack.tf/classifieds*
 // @match        *://backpack.tf/u/*
